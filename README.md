@@ -6,30 +6,39 @@ A multi-tenant system that connects to Shopify, ingests data from multiple store
 
 - **Backend**: Node.js with Express
 - **Database**: PostgreSQL with Prisma ORM
-- **Frontend**: Next.js (App Router) with Tailwind CSS
+- **Frontend**: React with Vite and Tailwind CSS
 - **Charts**: Recharts
-- **API Client**: Axios
+- **API Client**: Fetch API
 
 ## Project Structure
 
 ```
 .
-├── client/                    # Next.js frontend application
-│   ├── app/                   # Next.js App Router pages
-│   │   ├── dashboard/        # Analytics dashboard page
-│   │   └── layout.js         # Root layout
-│   ├── components/            # React components
-│   │   └── StatCard.js       # Reusable stat card component
-│   └── lib/                   # Utility functions
-│       └── api.js            # API client functions
+├── client/                    # React + Vite frontend application
+│   ├── src/
+│   │   ├── App.jsx            # Main App component
+│   │   ├── main.jsx           # Entry point
+│   │   ├── index.css          # Global styles with Tailwind CSS
+│   │   ├── components/        # React components
+│   │   │   ├── Dashboard.jsx  # Analytics dashboard page
+│   │   │   └── StatCard.jsx   # Reusable stat card component
+│   │   └── lib/               # Utility functions
+│   │       └── api.js         # API client functions
+│   ├── vite.config.js         # Vite configuration
+│   ├── tailwind.config.cjs    # Tailwind CSS configuration
+│   └── package.json
 │
 └── server/                    # Node.js + Express backend
+    ├── src/
+    │   └── index.js           # Express app entry point
     ├── prisma/
-    │   └── schema.prisma     # Database schema definition
+    │   └── schema.prisma      # Database schema definition
     ├── routes/
-    │   └── analytics.js      # Analytics API endpoints
-    └── services/
-        └── shopifyIngest.js  # Shopify data ingestion service
+    │   └── analytics.js       # Analytics API endpoints
+    ├── services/
+    │   └── shopifyIngest.js   # Shopify data ingestion service
+    ├── package.json
+    └── .env                   # Environment variables
 ```
 
 ## High-Level Architecture
@@ -46,9 +55,9 @@ A multi-tenant system that connects to Shopify, ingests data from multiple store
                               │ REST API
                               │
                        ┌──────▼──────┐
-                       │   Next.js   │
+                       │   React     │
                        │   Frontend  │
-                       │  (Dashboard)│
+                       │ (Vite + TC) │
                        └─────────────┘
 ```
 
@@ -77,11 +86,12 @@ A multi-tenant system that connects to Shopify, ingests data from multiple store
    - Aggregates data from PostgreSQL using Prisma queries
    - Returns JSON responses for frontend consumption
 
-4. **Frontend Dashboard** (`client/app/dashboard/`):
-   - Next.js application fetches data from analytics API
+4. **Frontend Dashboard** (`client/src/components/Dashboard.jsx`):
+   - React + Vite application fetches data from analytics API
    - Displays statistics in card components
    - Visualizes sales trends using Recharts line chart
    - Shows top customers in a responsive table
+   - Tailwind CSS for styling
 
 ## Database Schema
 
@@ -257,10 +267,10 @@ All relationships use cascade delete to maintain referential integrity.
 
 3. **Set up environment variables (optional):**
 
-   Create a `.env.local` file in the `client` directory:
+   Create a `.env` file in the `client` directory (or use `.env.local`):
 
    ```env
-   NEXT_PUBLIC_API_URL=http://localhost:3001/api
+   VITE_API_URL=http://localhost:3001/api
    ```
 
    If not set, it defaults to `http://localhost:3001/api`.
@@ -278,7 +288,7 @@ All relationships use cascade delete to maintain referential integrity.
    Open your browser and navigate to:
 
    ```
-   http://localhost:3000/dashboard
+   http://localhost:3000
    ```
 
 ### Running Data Ingestion
@@ -469,4 +479,4 @@ npx prisma migrate reset
 ## License
 
 This project is created for technical assessment purposes.
-"# Shopify-Ingestion-Xeno" 
+"# Shopify-Ingestion-Xeno"
