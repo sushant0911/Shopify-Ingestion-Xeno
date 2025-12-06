@@ -1,0 +1,64 @@
+// prisma/schema.prisma
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// Multi-tenant Store Model
+model Tenant {
+  id          String     @id @default(uuid())
+  shopDomain  String     @unique // e.g., "my-store.myshopify.com"
+  accessToken String?
+  products    Product[]
+  customers   Customer[]
+  orders      Order[]
+  createdAt   DateTime   @default(now())
+}
+
+// Product Model
+model Product {
+  id               String @id @default(uuid())
+  shopifyProductId String // The ID from Shopify (e.g., 84930...)
+  title            String
+  price            Float  @default(0.0)
+  tenantId         String
+  tenant           Tenant @relation(fields: [tenantId], references: [id])
+
+  @@unique([shopifyProductId, tenantId]) // Prevent duplicate products for the same store
+}
+
+// Customer Model
+model Customer {
+  id                String  @id @default(uuid())
+  shopifyCustomerId String
+  firstName         String?
+  lastName          String?
+  email             String?
+  totalSpend        Float   @default(0.0)
+  orders            Order[]
+  tenantId          String
+  tenant            Tenant  @relation(fields: [tenantId], references: [id])
+
+  @@unique([shopifyCustomerId, tenantId])
+}
+
+// Order Model
+model Order {
+  id             String   @id @default(uuid())
+  shopifyOrderId String
+  totalPrice     Float    @default(0.0)
+  createdAt      DateTime
+
+  customerId String?
+  customer   Customer? @relation(fields: [customerId], references: [id])
+
+  tenantId String
+  tenant   Tenant @relation(fields: [tenantId], references: [id])
+
+  @@unique([shopifyOrderId, tenantId])
+}
